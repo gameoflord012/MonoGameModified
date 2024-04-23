@@ -370,11 +370,19 @@ namespace Microsoft.Xna.Framework.Content
             }
 
             // Load the asset.
+            if(AssetNameResolver != null) assetName = AssetNameResolver(assetName, typeof(T));
             result = ReadAsset<T>(assetName, null);
 
             loadedAssets[key] = result;
             return result;
 		}
+
+        /// <summary>
+        /// Name of loading asset will be more process before actually reading the asset file <br/>
+        /// input: original asset name <br/>
+        /// output: resolved asset name
+        /// </summary>
+        public Func<string, Type, string> AssetNameResolver { get; set; }
 
         /// <summary />
 		protected virtual Stream OpenStream(string assetName)
