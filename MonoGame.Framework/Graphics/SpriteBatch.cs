@@ -298,6 +298,102 @@ namespace Microsoft.Xna.Framework.Graphics
             Draw(texture, position, sourceRectangle, color, rotation, origin, scaleVec, effects, layerDepth);
 		}
 
+        public void DrawWorld(Texture2D texture,
+                Vector2 position,
+                Rectangle? textureRegion,
+                Color color,
+                float rotation,
+                Vector2 origin,
+                Vector2 scale,
+                SpriteEffects effects,
+                float layerDepth)
+        {
+            CheckValid(texture);
+
+            var item = _batcher.CreateBatchItem();
+            item.Texture = texture;
+
+            // set SortKey based on SpriteSortMode.
+            switch (_sortMode)
+            {
+                // Comparison of Texture objects.
+                case SpriteSortMode.Texture:
+                    item.SortKey = texture.SortingKey;
+                    break;
+                // Comparison of Depth
+                case SpriteSortMode.FrontToBack:
+                    item.SortKey = layerDepth;
+                    break;
+                // Comparison of Depth in reverse
+                case SpriteSortMode.BackToFront:
+                    item.SortKey = -layerDepth;
+                    break;
+            }
+
+            origin = origin * scale;
+
+            float w, h;
+            if (textureRegion.HasValue)
+            {
+                var srcRect = textureRegion.GetValueOrDefault();
+                w = srcRect.Width * scale.X;
+                h = srcRect.Height * scale.Y;
+                _texCoordTL.X = srcRect.X * texture.TexelWidth;
+                _texCoordTL.Y = srcRect.Y * texture.TexelHeight;
+                _texCoordBR.X = (srcRect.X + srcRect.Width) * texture.TexelWidth;
+                _texCoordBR.Y = (srcRect.Y + srcRect.Height) * texture.TexelHeight;
+            }
+            else
+            {
+                w = texture.Width * scale.X;
+                h = texture.Height * scale.Y;
+                _texCoordTL = Vector2.Zero;
+                _texCoordBR = Vector2.One;
+            }
+
+            if ((effects & SpriteEffects.FlipVertically) != 0)
+            {
+                var temp = _texCoordBR.Y;
+                _texCoordBR.Y = _texCoordTL.Y;
+                _texCoordTL.Y = temp;
+            }
+            if ((effects & SpriteEffects.FlipHorizontally) != 0)
+            {
+                var temp = _texCoordBR.X;
+                _texCoordBR.X = _texCoordTL.X;
+                _texCoordTL.X = temp;
+            }
+
+            if (rotation == 0f)
+            {
+                item.Set(position.X - origin.X,
+                        position.Y + origin.Y,
+                        w,
+                        -h,
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        layerDepth);
+            }
+            else
+            {
+                item.Set(position.X,
+                        position.Y,
+                        - origin.X,
+                        + origin.Y,
+                        w,
+                        -h,
+                        MathF.Sin(-rotation),
+                        MathF.Cos(-rotation),
+                        color,
+                        _texCoordTL,
+                        _texCoordBR,
+                        layerDepth);
+            }
+
+            FlushIfNeeded();
+        }
+
         /// <summary>
         /// Submit a sprite for drawing in the current batch.
         /// </summary>
