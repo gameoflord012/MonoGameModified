@@ -3,7 +3,7 @@
 	<Import Project="..\MonoGame.props" />
 
 	<PropertyGroup>
-		<TargetFramework>net8.0-windows</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<BaseOutputPath>..\Artifacts\MonoGame.Framework.Content.Pipeline</BaseOutputPath>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Description>The Monogame Content Pipeline for Windows, Mac and Linux is used to compile raw content to xnb files.</Description>
@@ -69,7 +69,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.WindowsDX.csproj">
+		<ProjectReference Include="..\MonoGame.Framework\MonoGame.Framework.DesktopGL.csproj">
 			<PrivateAssets>All</PrivateAssets>
 		</ProjectReference>
 	</ItemGroup>
