@@ -377,6 +377,34 @@ namespace Microsoft.Xna.Framework.Content
             return result;
 		}
 
+        public virtual T LoadNew<T>(string assetName)
+        {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException("assetName");
+            }
+            if (disposed)
+            {
+                throw new ObjectDisposedException("ContentManager");
+            }
+
+            T result = default(T);
+
+            // On some platforms, name and slash direction matter.
+            // We store the asset by a /-separating key rather than how the
+            // path to the file was passed to us to avoid
+            // loading "content/asset1.xnb" and "content\\ASSET1.xnb" as if they were two 
+            // different files. This matches stock XNA behavior.
+            // The dictionary will ignore case differences
+            var key = assetName.Replace('\\', '/');
+
+            // Load the asset.
+            if (AssetNameResolver != null) assetName = AssetNameResolver(assetName, typeof(T));
+            result = ReadAsset<T>(assetName, null);
+
+            return result;
+        }
+
         /// <summary>
         /// Name of loading asset will be more process before actually reading the asset file <br/>
         /// input: original asset name <br/>
